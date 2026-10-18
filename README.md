@@ -1,0 +1,156 @@
+# Flask Task Manager API
+
+A RESTful task management API built with Python, Flask, and SQLite. The project supports user authentication, persistent task storage, and user-specific task management.
+
+## Features
+
+- User registration with hashed passwords
+- Login with JSON Web Token (JWT) authentication
+- Create, read, update, and delete tasks
+- Task filtering by category and completion status
+- User-specific task ownership and access restrictions
+- SQLite database with foreign-key constraints
+- Centralized database connection and transaction management
+- Automated API testing with pytest
+
+## Technologies
+
+- Python 3
+- Flask
+- SQLite
+- Flask-JWT-Extended
+- Werkzeug
+- pytest
+
+## Installation
+
+Clone the repository and navigate into the backend folder.
+
+```bash
+cd backend
+python -m venv .venv
+```
+
+Activate the virtual environment.
+
+Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+Install dependencies:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+Configure a JWT secret key before starting the application.
+
+Windows PowerShell:
+
+```powershell
+$env:JWT_SECRET_KEY = python -c "import secrets; print(secrets.token_hex(32))"
+```
+
+Start the development server:
+
+```bash
+flask --app app run --debug
+```
+
+The API will be available at `http://127.0.0.1:5000`.
+
+The SQLite database and required tables are initialized automatically.
+
+## API Endpoints
+
+| Method | Endpoint | Description | Authentication |
+|---|---|---|---|
+| POST | `/api/register` | Register a user | No |
+| POST | `/api/login` | Log in and receive a JWT | No |
+| GET | `/api/tasks` | Retrieve and filter tasks | Yes |
+| POST | `/api/tasks` | Create a task | Yes |
+| GET | `/api/tasks/<task_id>` | Retrieve a task | Yes |
+| PATCH | `/api/tasks/<task_id>` | Update a task | Yes |
+| DELETE | `/api/tasks/<task_id>` | Delete a task | Yes |
+
+Authenticated endpoints require an HTTP header:
+
+```text
+Authorization: Bearer <access_token>
+```
+
+### Example: Create a task
+
+Request:
+
+```http
+POST /api/tasks
+Content-Type: application/json
+Authorization: Bearer <access_token>
+```
+
+JSON body:
+
+```json
+{
+  "title": "Study Python",
+  "description": "Practice REST APIs",
+  "category": "Programming",
+  "completed": false
+}
+```
+
+The API responds with the created task and HTTP status `201 Created`.
+
+### Filtering tasks
+
+Filter by category:
+
+```text
+GET /api/tasks?category=Programming
+```
+
+Filter by completion:
+
+```text
+GET /api/tasks?completed=true
+```
+
+Multiple category parameters are supported.
+
+## Automated Testing
+
+The project includes 19 automated tests covering authentication, CRUD functionality, input validation, filtering, and cross-user access restrictions.
+
+From the `backend` directory:
+
+```bash
+python -m pytest tests -v
+```
+
+Tests use temporary SQLite databases to avoid modifying the application's data.
+
+## Project Structure
+
+```text
+Todo-app/
+├── .gitignore
+├── README.md
+└── backend/
+    ├── app.py
+    ├── database.py
+    ├── requirements.txt
+    └── tests/
+        ├── conftest.py
+        └── test_api.py
+```
+
+Runtime database files, virtual environments, and Python caches are excluded from version control.
+
+## Notes
+
+This project was developed as a Python backend learning and portfolio project. It demonstrates REST API development, authentication, relational databases, transaction management, and automated testing.
+
+The Flask development server is intended for local development, not production deployment.
