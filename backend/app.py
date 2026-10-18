@@ -15,6 +15,7 @@ accepted_keys = {"title", "description", "category", "completed"}
 boolean_keys = {"true": True, "false": False, None: None}
 required_keys = ["username", "password"]
 
+# register a user
 @app.route("/api/register", methods=["POST"])
 def register():
     json_data = validate_data()
@@ -30,6 +31,7 @@ def register():
     new_user = {"id": new_user_id, "username": json_data["username"]}
     return new_user, 201
 
+# login the user, username and password must match
 @app.route("/api/login", methods=["POST"])
 def login():
     json_data = validate_data()
@@ -44,6 +46,8 @@ def login():
 
     return {"message": "Login successful", "access_token": access_token}, 200
 
+# get task, includes the ability to get tasks based on category and completed status
+# only allows user who created the task to be able to view this task
 @app.route("/api/tasks")
 @jwt_required()
 def get_task():
@@ -60,7 +64,8 @@ def get_task():
     )
 
     return user_tasks
-
+# create a task. adds empty category, description and also defaults completed into false if not
+# provided by the user
 @app.route("/api/tasks", methods=["POST"])
 @jwt_required()
 def create_task():
@@ -96,7 +101,7 @@ def create_task():
 
     return new_task, 201
 
-
+# updates a task. if no task was found cause it doesnt exist or wrong user, error 404
 @app.route("/api/tasks/<int:task_id>", methods=["PATCH"])
 @jwt_required()
 def update_task(task_id: int):
@@ -122,6 +127,7 @@ def update_task(task_id: int):
 
     return get_task_by_id(task_id)
 
+# deletes a task. return 204 code to message that process was completed
 @app.route("/api/tasks/<int:task_id>", methods=["DELETE"])
 @jwt_required()
 def delete_task(task_id: int):
@@ -131,7 +137,7 @@ def delete_task(task_id: int):
         abort(404, description="Expected task to exist")
     return "", 204
 
-#both http request and a helper function
+# get task using task id, functions as a helper as well
 @app.route("/api/tasks/<int:task_id>")
 @jwt_required()
 def get_task_by_id(task_id: int):
@@ -141,13 +147,12 @@ def get_task_by_id(task_id: int):
         abort(404, description="Expected task to exist")
     return task
 
-#validation helper functions below
+# validation helper functions below
 def validate_data():
     json_data = request.get_json()
     if not isinstance(json_data, dict):
         abort(400, description="Expected dictionary data type")
     return json_data   
-
 
 def validate_title(title: str, field="title"):
     if not isinstance(title, str):
