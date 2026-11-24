@@ -1,6 +1,6 @@
 # Debugging the Task Manager API
 
-This document records concrete problems I encountered while developing the backend. Some happened in the earlier in-memory version and are no longer present in the current source. The final implementation is in [backend/app.py](./backend/app.py) and [backend/database.py](./backend/database.py); the automated checks are in [backend/tests/test_api.py](./backend/tests/test_api.py).
+While developing the backend, I encountered problems in both the early in-memory version and the later database-backed API. I describe how I investigated and resolved them here. The final implementation is in [backend/app.py](./backend/app.py) and [backend/database.py](./backend/database.py); the automated checks are in [backend/tests/test_api.py](./backend/tests/test_api.py).
 
 ## Validating before accessing request fields
 
@@ -62,6 +62,6 @@ This experience highlighted the importance of understanding the responsibilities
 
 ## Reproducing and checking fixes
 
-I used PowerShell HTTP requests during development to compare expected and actual statuses and bodies for valid and invalid input, CRUD operations, filters, and authentication. After the main functionality was built, pytest made those checks repeatable. The current suite contains 19 tests, and its [fixture](./backend/tests/conftest.py) gives each test a temporary SQLite database and a test JWT secret. The development history records 19 passing tests at the end of the original development period. I do not claim that every manual scenario is covered by the suite: repeated and combined filters, `completed=false`, and several update validation branches are examples without direct tests.
+I used PowerShell HTTP requests during development to compare expected and actual statuses and bodies for valid and invalid input, CRUD operations, filters, and authentication. After the main functionality was built, pytest made those checks repeatable. The suite contains 19 tests, and its [fixture](./backend/tests/conftest.py) gives each test a temporary SQLite database and a test JWT secret. All 19 tests passed at the end of the original development period. The suite does not directly cover every manual scenario; repeated and combined filters, `completed=false`, and several update validation branches are examples.
 
 My useful sequence when a request behaved unexpectedly was to reproduce it, record the status and body, confirm the edited code was saved and running, then trace the input through validation, the route, and the SQL operation. That helped me distinguish application defects from client display behavior, outdated code, storage representation, and missing frontend integration.
